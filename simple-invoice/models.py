@@ -4,14 +4,16 @@ from StringIO import StringIO
 from email.mime.application import MIMEApplication
 
 from django.db import models
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+try:
+    from django.utils import importlib
+except ImportError:
+    import importlib
 
-from .utils import format_currency, friendly_id
+from .utils import format_currency
 from .conf import settings as app_settings
 from .pdf import draw_pdf
 
@@ -38,7 +40,7 @@ class InvoiceManager(models.Manager):
 class Invoice(TimeStampedModel):
     recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE)
     currency = models.ForeignKey(Currency, blank=True, null=True)
-    invoice_id = models.CharField(unique=True, max_length=6, null=True,
+    invoice_id = models.CharField(unique=True, max_length=10, null=True,
                                   blank=True, editable=False)
     invoice_date = models.DateField(default=date.today)
     invoiced = models.BooleanField(default=False)
@@ -57,7 +59,8 @@ class Invoice(TimeStampedModel):
         super(Invoice, self).save(*args, **kwargs)
 
         if not self.invoice_id:
-            self.invoice_id = friendly_id.encode(self.pk)
+            inv_id_module = importlib.import_module(app_settings.INV_ID_MODULE)
+            self.invoice_id = inv_id_module.encode(self.pk)
             kwargs['force_insert'] = False
             super(Invoice, self).save(*args, **kwargs)
 

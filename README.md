@@ -15,6 +15,8 @@ Django-simple-invoice is a fork of [django-invoice (by simonluijk)](https://gith
 Install using `pip`...
 
     pip install django-simple-invoice
+    pip install django_extensions
+    pip install reportlab
 
 # Setup
 
@@ -42,7 +44,7 @@ Each invoice is link to a model. For exemple, I for a simple user that buy somet
 
 Invoice will be found the billing address using some property in your model.
 
-	class UserProfile(models.Model):		
+	class UserProfile(models.Model):
     	user = models.ForeignKey(User, null=True, blank=True)
     	contact_name = models.CharField(u'Nom du contact', max_length=255, null=True, blank=True)
     	phone = models.CharField(u'Téléphone', max_length=255)
@@ -66,9 +68,24 @@ Invoice will be found the billing address using some property in your model.
     	@property
     	def invoice_postcode(self):
     		return self.postal_code
-    	@property
-    	def invoice_contact_name(self):
-    		return self.contact_name
+        @property
+        def invoice_contact_name(self):
+            return self.contact_name
+        @property
+        def email(self):
+            return self.mail
 
 Here, differents property which you can add to your model to set the billing address :
 `invoice_address_one`, `invoice_address_two`, `invoice_town`, `invoice_county`, `invoice_postcode`, `invoice_contact_name`
+
+
+## Cutomize invoice numbering
+
+Add to  your `settings.py` :
+
+    INV_ID_MODULE = 'invoice_mod.numbering'
+
+This module must have a method called `encode` that take the invoice PK and return the invoice number :
+
+    def encode(pk):
+        # ...

@@ -12,3 +12,5 @@ INV_EMAIL_SUBJECT = getattr(settings, 'INV_EMAIL_SUBJECT',
                             u'[%s] Invoice %%(invoice_id)s' % (
                                 settings.SITE_NAME))
 INV_CLIENT_MODULE = getattr(settings, 'INV_CLIENT_MODULE', 'auth.User')
+INV_ID_MODULE = getattr(settings, 'INV_ID_MODULE',
+                        'invoice.utils.friendly_id')

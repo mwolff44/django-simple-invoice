@@ -12,5 +12,5 @@ def pdf_view(request, pk):
 
 @login_required
 def pdf_user_view(request, invoice_id):
-    invoice = get_object_or_404(Invoice, invoice_id=invoice_id, user=request.user)
+    invoice = get_object_or_404(Invoice, invoice_id=invoice_id)
     return pdf_response(draw_pdf, invoice.file_name(), invoice)

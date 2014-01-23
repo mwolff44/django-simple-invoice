@@ -100,7 +100,6 @@ def draw_pdf(buffer, invoice):
     textobject = canvas.beginText(1.5 * cm, -6.75 * cm)
     textobject.textLine(u'Invoice ID: %s' % invoice.invoice_id)
     textobject.textLine(u'Invoice Date: %s' % invoice.invoice_date.strftime('%d %b %Y'))
-    textobject.textLine(u'Client: %s' % invoice.recipient.username)
     canvas.drawText(textobject)
 
     # Items
