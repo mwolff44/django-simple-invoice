@@ -4,7 +4,6 @@ from StringIO import StringIO
 from email.mime.application import MIMEApplication
 
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
@@ -37,11 +36,8 @@ class InvoiceManager(models.Manager):
 
 
 class Invoice(TimeStampedModel):
-    user = models.ForeignKey(User)
+    recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE)
     currency = models.ForeignKey(Currency, blank=True, null=True)
-    address_content_type = models.ForeignKey(ContentType)
-    address_object_id = models.PositiveIntegerField()
-    address = generic.GenericForeignKey('address_content_type', 'address_object_id')
     invoice_id = models.CharField(unique=True, max_length=6, null=True,
                                   blank=True, editable=False)
     invoice_date = models.DateField(default=date.today)
@@ -58,9 +54,6 @@ class Invoice(TimeStampedModel):
         ordering = ('-invoice_date', 'id')
 
     def save(self, *args, **kwargs):
-        if self.address:
-            self.address_content_type = ContentType.objects.get_for_model(self.address)
-            self.address_object_id = self.address.pk
         super(Invoice, self).save(*args, **kwargs)
 
         if not self.invoice_id:
@@ -91,7 +84,7 @@ class Invoice(TimeStampedModel):
         pdf.close()
 
         subject = app_settings.INV_EMAIL_SUBJECT % {"invoice_id": self.invoice_id}
-        email = EmailMessage(subject=subject, to=[self.user.email])
+        email = EmailMessage(subject=subject, to=[self.recipient.email])
         email.body = render_to_string("invoice/invoice_email.txt", {
             "invoice": self,
             "SITE_NAME": settings.SITE_NAME,

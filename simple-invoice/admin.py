@@ -13,17 +13,15 @@ class InvoiceAdmin(admin.ModelAdmin):
     inlines = [InvoiceItemInline, ]
     fieldsets = (
         (None, {
-            'fields': ('user', 'address_content_type', 'address_object_id', 'invoice_date', 'paid_date', 'draft', 'currency')
+            'fields': ('recipient', 'invoice_date', 'paid_date', 'draft',
+                       'currency')
         }),
     )
-    related_lookup_fields = {
-        'generic': [['address_content_type', 'address_object_id'],],
-    }
-    search_fields = ('invoice_id', 'user__username')
+    search_fields = ('invoice_id',)
     list_display = (
         'invoice_id',
         'total_amount',
-        'user',
+        'recipient',
         'draft',
         'invoice_date',
         'invoiced',
