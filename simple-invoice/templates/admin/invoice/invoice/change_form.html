@@ -1,12 +1,16 @@
 {% extends "admin/change_form.html" %}
 {% load i18n %}
 
-{% block object-tools %}
-{% if change %}{% if not is_popup %}
-  <ul class="object-tools">
-    <li><a href="history/" class="historylink">{% trans "History" %}</a></li>
-    {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
-    <li><a href="pdf/">{% trans "PDF" %}</a></li>
-  </ul>
-{% endif %}{% endif %}
+{% block object-tools-items %}
+{{ block.super }}
+<div class="span2">
+    <a href="pdf/generate" class="big-button" onclick="return confirm('{% trans "If the a PDF is already generated, it will be replaced. Are you sure to do this?" %}')">
+        <i class="reload-item"></i>{% trans "Generate PDF" %}{{invoice.pk}}
+    </a>
+</div>
+<div class="span2">
+    <a href="pdf/download/" class="big-button">
+        <i class="download-item"></i>{% trans "Download PDF" %}
+    </a>
+</div>
 {% endblock %}

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import date
 from decimal import Decimal
 from StringIO import StringIO
@@ -8,6 +9,7 @@ from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
+from django.utils.translation import ugettext_lazy as _
 try:
     from django.utils import importlib
 except ImportError:
@@ -38,14 +40,37 @@ class InvoiceManager(models.Manager):
 
 
 class Invoice(TimeStampedModel):
-    recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE)
-    currency = models.ForeignKey(Currency, blank=True, null=True)
-    invoice_id = models.CharField(unique=True, max_length=10, null=True,
-                                  blank=True, editable=False)
-    invoice_date = models.DateField(default=date.today)
-    invoiced = models.BooleanField(default=False)
-    draft = models.BooleanField(default=False)
-    paid_date = models.DateField(blank=True, null=True)
+
+    METHOD_CHOICES = (
+        ('cheque', _(u'Chèque')),
+        ('virement', _(u'Virement')),
+    )
+
+    recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE,
+                                  verbose_name=_(u'recipient'))
+    currency = models.ForeignKey(Currency, blank=True, null=True,
+                                 verbose_name=_(u'currency'))
+    invoice_id = models.CharField(_(u'invoice ID'), unique=True, max_length=10,
+                                  null=True, blank=True, editable=False)
+    invoice_date = models.DateField(_(u'invoice date'), default=date.today)
+    # cost accounting code
+    invoice_cost_code = models.CharField(_(u"cost accounting code"),
+                                         max_length=10, blank=True, null=True)
+    invoiced = models.BooleanField(_(u"invoiced"), default=False)
+    draft = models.BooleanField(_(u"draft"), default=False)
+
+    paid_date = models.DateField(_(u"paid date"), blank=True, null=True)
+    payment_method = models.CharField(_(u"payment method"), max_length=20,
+                                      choices=METHOD_CHOICES,
+                                      blank=True, null=True)
+    payment_additional_info = models.CharField(_(u"additional informations"),
+                                               max_length=20, blank=True,
+                                               null=True,
+                                               help_text=_(u"eg. payment id"))
+    creation_date = models.DateTimeField(_(u"date of creation"),
+                                         auto_now_add=True)
+    modification_date = models.DateTimeField(_(u"date of modification"),
+                                             auto_now=True)
 
     objects = InvoiceManager()
 
@@ -66,15 +91,17 @@ class Invoice(TimeStampedModel):
 
     def total_amount(self):
         return format_currency(self.total(), self.currency)
+    total_amount.short_description = _(u"total amount")
 
     def total(self):
         total = Decimal('0.00')
         for item in self.items.all():
             total = total + item.total()
         return total
+    total.short_description = _(u"total")
 
     def file_name(self):
-        return u'Invoice %s.pdf' % self.invoice_id
+        return u'invoice_%s.pdf' % self.invoice_id
 
     def send_invoice(self):
         pdf = StringIO()
@@ -86,7 +113,8 @@ class Invoice(TimeStampedModel):
                               filename=self.file_name())
         pdf.close()
 
-        subject = app_settings.INV_EMAIL_SUBJECT % {"invoice_id": self.invoice_id}
+        subject = app_settings.INV_EMAIL_SUBJECT %\
+            {"invoice_id": self.invoice_id}
         email = EmailMessage(subject=subject, to=[self.recipient.email])
         email.body = render_to_string("invoice/invoice_email.txt", {
             "invoice": self,
@@ -103,10 +131,17 @@ class Invoice(TimeStampedModel):
 
 
 class InvoiceItem(models.Model):
-    invoice = models.ForeignKey(Invoice, related_name='items', unique=False)
-    description = models.CharField(max_length=100)
-    unit_price = models.DecimalField(max_digits=8, decimal_places=2)
-    quantity = models.DecimalField(max_digits=8, decimal_places=2, default=1)
+    invoice = models.ForeignKey(Invoice, related_name='items', unique=False,
+                                verbose_name=_(u'invoice'))
+    description = models.CharField(_(u"description"), max_length=100)
+    unit_price = models.DecimalField(_(u"unit price"), max_digits=8,
+                                     decimal_places=2)
+    quantity = models.DecimalField(_(u"quantity"), max_digits=8,
+                                   decimal_places=2, default=1)
+    creation_date = models.DateTimeField(_(u"date of creation"),
+                                         auto_now_add=True)
+    modification_date = models.DateTimeField(_(u"date of modification"),
+                                             auto_now=True)
 
     def total(self):
         total = Decimal(str(self.unit_price * self.quantity))

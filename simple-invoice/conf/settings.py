@@ -14,3 +14,5 @@ INV_EMAIL_SUBJECT = getattr(settings, 'INV_EMAIL_SUBJECT',
 INV_CLIENT_MODULE = getattr(settings, 'INV_CLIENT_MODULE', 'auth.User')
 INV_ID_MODULE = getattr(settings, 'INV_ID_MODULE',
                         'invoice.utils.friendly_id')
+INV_PDF_DIR = getattr(settings, 'INV_PDF_DIR',
+                      path.join(settings.MEDIA_ROOT, 'invoices/pdf/'))
