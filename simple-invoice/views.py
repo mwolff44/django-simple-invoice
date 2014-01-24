@@ -8,24 +8,22 @@ from django.http import HttpResponse
 from invoice.models import Invoice
 from invoice.pdf import draw_pdf
 from invoice.utils import pdf_response
-from invoice.conf import settings as app_settings
 
-from os.path import isfile, join, getsize
+from os.path import getsize
 from django.core.servers.basehttp import FileWrapper
 
 
 def pdf_dl_view(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
 
-    file_path = join(app_settings.INV_PDF_DIR, invoice.file_name())
-    if isfile(file_path):
+    if invoice.is_pdf_generated():
         # Serving file is not Django's job
         # If this need an optimisation, see X-sendfile mod (Apache/nginx)
-        wrapper = FileWrapper(file(file_path))
+        wrapper = FileWrapper(file(invoice.pdf_path()))
         response = HttpResponse(wrapper, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename="%s"' %\
             invoice.file_name()
-        response['Content-Length'] = getsize(file_path)
+        response['Content-Length'] = getsize(invoice.pdf_path())
         return response
     else:
         messages.add_message(request, messages.ERROR,
@@ -35,8 +33,7 @@ def pdf_dl_view(request, pk):
 
 def pdf_gen_view(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
-    file_path = join(app_settings.INV_PDF_DIR, invoice.file_name())
-    draw_pdf(file_path, invoice)
+    invoice.generate_pdf()
     messages.add_message(request, messages.INFO,
                          _(u"The PDF have been generated."))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

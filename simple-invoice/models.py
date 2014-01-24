@@ -3,6 +3,7 @@ from datetime import date
 from decimal import Decimal
 from StringIO import StringIO
 from email.mime.application import MIMEApplication
+from os.path import join, isfile
 
 from django.db import models
 from django.conf import settings
@@ -102,6 +103,19 @@ class Invoice(TimeStampedModel):
 
     def file_name(self):
         return u'invoice_%s.pdf' % self.invoice_id
+
+    def generate_pdf(self):
+        draw_pdf(self.pdf_path(), self)
+
+    def is_pdf_generated(self):
+        if isfile(self.pdf_path()):
+            return True
+        else:
+            return False
+
+    def pdf_path(self):
+        # Beware, the file might not be here if it has not been generated yet
+        return join(app_settings.INV_PDF_DIR, self.file_name())
 
     def send_invoice(self):
         pdf = StringIO()
