@@ -37,6 +37,15 @@ class InvoiceAdmin(admin.ModelAdmin):
     form = InvoiceAdminForm
     actions = ['send_invoice', ]
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        actions = super(InvoiceAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
     def get_urls(self):
         urls = super(InvoiceAdmin, self).get_urls()
         wrapped_pdf_dl_view = self.admin_site.admin_view(pdf_dl_view)

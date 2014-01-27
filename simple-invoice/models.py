@@ -105,43 +105,47 @@ class Invoice(TimeStampedModel):
         return u'invoice_%s.pdf' % self.invoice_id
 
     def generate_pdf(self):
-        draw_pdf(self.pdf_path(), self)
+        return draw_pdf(self.pdf_path(), self)
 
     def is_pdf_generated(self):
-        if isfile(self.pdf_path()):
-            return True
-        else:
-            return False
+        return isfile(self.pdf_path())
 
     def pdf_path(self):
         # Beware, the file might not be here if it has not been generated yet
         return join(app_settings.INV_PDF_DIR, self.file_name())
 
-    def send_invoice(self):
-        pdf = StringIO()
-        draw_pdf(pdf, self)
-        pdf.seek(0)
+    def send_invoice(self, to_email=None, subject=None):
+        if self.recipient.email or to_email:
+            pdf = StringIO()
+            draw_pdf(pdf, self)
+            pdf.seek(0)
 
-        attachment = MIMEApplication(pdf.read())
-        attachment.add_header("Content-Disposition", "attachment",
-                              filename=self.file_name())
-        pdf.close()
+            attachment = MIMEApplication(pdf.read())
+            attachment.add_header("Content-Disposition", "attachment",
+                                  filename=self.file_name())
+            pdf.close()
 
-        subject = app_settings.INV_EMAIL_SUBJECT %\
-            {"invoice_id": self.invoice_id}
-        email = EmailMessage(subject=subject, to=[self.recipient.email])
-        email.body = render_to_string("invoice/invoice_email.txt", {
-            "invoice": self,
-            "SITE_NAME": settings.SITE_NAME,
-            "INV_CURRENCY": app_settings.INV_CURRENCY,
-            "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL,
-            "SUPPORT_EMAIL": settings.MANAGERS[0][1],
-        })
-        email.attach(attachment)
-        email.send()
+            if not to_email:
+                to_email = self.recipient.email
+            if not subject:
+                subject = app_settings.INV_EMAIL_SUBJECT %\
+                    {"invoice_id": self.invoice_id}
+            email = EmailMessage(subject=subject, to=[to_email])
+            email.body = render_to_string("invoice/invoice_email.txt", {
+                "invoice": self,
+                "SITE_NAME": settings.SITE_NAME,
+                "INV_CURRENCY": app_settings.INV_CURRENCY,
+                "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL,
+            })
+            #email.attach(attachment)
+            email.send()
 
-        self.invoiced = True
-        self.save()
+            self.invoiced = True
+            self.save()
+
+            return True
+        else:
+            return False
 
 
 class InvoiceItem(models.Model):

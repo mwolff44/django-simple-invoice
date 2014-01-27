@@ -99,7 +99,8 @@ def draw_pdf(buffer, invoice):
     # Info
     textobject = canvas.beginText(1.5 * cm, -6.75 * cm)
     textobject.textLine(u'Invoice ID: %s' % invoice.invoice_id)
-    textobject.textLine(u'Invoice Date: %s' % invoice.invoice_date.strftime('%d %b %Y'))
+    textobject.textLine(u'Invoice Date: %s' % invoice.invoice_date.strftime(
+        '%d %b %Y'))
     canvas.drawText(textobject)
 
     # Items
@@ -111,7 +112,8 @@ def draw_pdf(buffer, invoice):
             format_currency(item.unit_price, invoice.currency),
             format_currency(item.total(), invoice.currency)
         ])
-    data.append([u'', u'', u'Total:', format_currency(invoice.total(), invoice.currency)])
+    data.append([u'', u'', u'Total:', format_currency(invoice.total(),
+                 invoice.currency)])
     table = Table(data, colWidths=[2 * cm, 11 * cm, 3 * cm, 3 * cm])
     table.setStyle([
         ('FONT', (0, 0), (-1, -1), 'Helvetica'),
@@ -127,3 +129,5 @@ def draw_pdf(buffer, invoice):
 
     canvas.showPage()
     canvas.save()
+
+    return canvas

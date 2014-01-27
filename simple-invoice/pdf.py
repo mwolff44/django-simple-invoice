@@ -22,5 +22,8 @@ def footer_func(*args, **kwargs):
 
 
 def draw_pdf(*args, **kwargs):
-    inv_module = importlib.import_module(settings.INV_MODULE)
-    inv_module.draw_pdf(*args, **kwargs)
+    try:
+        inv_module = importlib.import_module(settings.INV_MODULE)
+        return inv_module.draw_pdf(*args, **kwargs)
+    except:
+        return False
