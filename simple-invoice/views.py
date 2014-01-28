@@ -33,9 +33,12 @@ def pdf_dl_view(request, pk):
 
 def pdf_gen_view(request, pk):
     invoice = get_object_or_404(Invoice, pk=pk)
-    invoice.generate_pdf()
-    messages.add_message(request, messages.INFO,
-                         _(u"The PDF have been generated."))
+    if invoice.generate_pdf():
+        messages.add_message(request, messages.INFO,
+                             _(u"The PDF have been generated."))
+    else:
+        messages.add_message(request, messages.ERROR,
+                             _(u"Error, the PDF have not been generated."))
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

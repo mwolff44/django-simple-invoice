@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.conf.urls import patterns
 from django.utils.translation import ugettext_lazy as _
-from invoice.models import Invoice, InvoiceItem, Currency
+from invoice.models import Invoice, InvoiceItem, Currency, InvoicePayment
 from invoice.views import pdf_dl_view, pdf_gen_view
 from invoice.forms import InvoiceAdminForm
 
@@ -11,16 +11,16 @@ class InvoiceItemInline(admin.TabularInline):
     model = InvoiceItem
 
 
+class InvoicePaymentInline(admin.TabularInline):
+    model = InvoicePayment
+
+
 class InvoiceAdmin(admin.ModelAdmin):
-    inlines = [InvoiceItemInline, ]
+    inlines = [InvoiceItemInline, InvoicePaymentInline, ]
     fieldsets = [
         (None, {
             'fields': ['recipient', 'invoice_date', 'draft',
                        'currency', 'invoice_cost_code']
-        }),
-        (_(u'Payment'), {
-            'fields': ['paid_date', 'payment_method',
-                       'payment_additional_info']
         }),
     ]
 
@@ -32,7 +32,6 @@ class InvoiceAdmin(admin.ModelAdmin):
         'draft',
         'invoice_date',
         'invoiced',
-        'paid_date',
     )
     form = InvoiceAdminForm
     actions = ['send_invoice', ]

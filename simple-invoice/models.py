@@ -41,12 +41,6 @@ class InvoiceManager(models.Manager):
 
 
 class Invoice(TimeStampedModel):
-
-    METHOD_CHOICES = (
-        ('cheque', _(u'Chèque')),
-        ('virement', _(u'Virement')),
-    )
-
     recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE,
                                   verbose_name=_(u'recipient'))
     currency = models.ForeignKey(Currency, blank=True, null=True,
@@ -60,14 +54,6 @@ class Invoice(TimeStampedModel):
     invoiced = models.BooleanField(_(u"invoiced"), default=False)
     draft = models.BooleanField(_(u"draft"), default=False)
 
-    paid_date = models.DateField(_(u"paid date"), blank=True, null=True)
-    payment_method = models.CharField(_(u"payment method"), max_length=20,
-                                      choices=METHOD_CHOICES,
-                                      blank=True, null=True)
-    payment_additional_info = models.CharField(_(u"additional informations"),
-                                               max_length=20, blank=True,
-                                               null=True,
-                                               help_text=_(u"eg. payment id"))
     creation_date = models.DateTimeField(_(u"date of creation"),
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
@@ -93,6 +79,15 @@ class Invoice(TimeStampedModel):
     def total_amount(self):
         return format_currency(self.total(), self.currency)
     total_amount.short_description = _(u"total amount")
+
+    @property
+    def is_paid(self):
+        total_paid = 0
+        for payment in self.payments.all():
+            total_paid += payment.amount
+        return (total_paid >= self.total())
+    # is_paid.short_description = _(u"is paid?")
+    # is_paid.boolean = True
 
     def total(self):
         total = Decimal('0.00')
@@ -137,7 +132,7 @@ class Invoice(TimeStampedModel):
                 "INV_CURRENCY": app_settings.INV_CURRENCY,
                 "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL,
             })
-            #email.attach(attachment)
+            email.attach(attachment)
             email.send()
 
             self.invoiced = True
@@ -167,3 +162,28 @@ class InvoiceItem(models.Model):
 
     def __unicode__(self):
         return self.description
+
+
+class InvoicePayment(models.Model):
+
+    METHOD_CHOICES = (
+        ('cheque', _(u'Chèque')),
+        ('virement', _(u'Virement')),
+    )
+
+    invoice = models.ForeignKey(Invoice, related_name='payments', unique=False,
+                                verbose_name=_(u'invoice'))
+    amount = models.DecimalField(_(u"amount"), max_digits=8,
+                                 decimal_places=2)
+    paid_date = models.DateField(_(u"paid date"), blank=True, null=True)
+    payment_method = models.CharField(_(u"payment method"), max_length=20,
+                                      choices=METHOD_CHOICES,
+                                      blank=True, null=True)
+    payment_additional_info = models.CharField(_(u"additional informations"),
+                                               max_length=20, blank=True,
+                                               null=True,
+                                               help_text=_(u"eg. payment id"))
+    creation_date = models.DateTimeField(_(u"date of creation"),
+                                         auto_now_add=True)
+    modification_date = models.DateTimeField(_(u"date of modification"),
+                                             auto_now=True)
