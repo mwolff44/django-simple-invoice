@@ -3,13 +3,15 @@ from datetime import date
 from decimal import Decimal
 from StringIO import StringIO
 from email.mime.application import MIMEApplication
+from email.MIMEImage import MIMEImage
 from os.path import join, isfile
 
 from django.db import models
 from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
 from django.utils.translation import ugettext_lazy as _
 try:
     from django.utils import importlib
@@ -80,14 +82,21 @@ class Invoice(TimeStampedModel):
         return format_currency(self.total(), self.currency)
     total_amount.short_description = _(u"total amount")
 
-    @property
     def is_paid(self):
         total_paid = 0
         for payment in self.payments.all():
             total_paid += payment.amount
         return (total_paid >= self.total())
-    # is_paid.short_description = _(u"is paid?")
-    # is_paid.boolean = True
+    is_paid.short_description = _(u"is paid?")
+    is_paid.boolean = True
+
+    def last_payment(self):
+        payments = self.payments.order_by('-paid_date')
+        if payments:
+            return payments[0]
+        else:
+            return None
+    last_payment.short_description = _(u"last payment")
 
     def total(self):
         total = Decimal('0.00')
@@ -109,7 +118,8 @@ class Invoice(TimeStampedModel):
         # Beware, the file might not be here if it has not been generated yet
         return join(app_settings.INV_PDF_DIR, self.file_name())
 
-    def send_invoice(self, to_email=None, subject=None):
+    def send_invoice(self, to_email=None, subject=None,
+                     template='invoice_email', images=()):
         if self.recipient.email or to_email:
             pdf = StringIO()
             draw_pdf(pdf, self)
@@ -125,14 +135,29 @@ class Invoice(TimeStampedModel):
             if not subject:
                 subject = app_settings.INV_EMAIL_SUBJECT %\
                     {"invoice_id": self.invoice_id}
-            email = EmailMessage(subject=subject, to=[to_email])
-            email.body = render_to_string("invoice/invoice_email.txt", {
-                "invoice": self,
+
+            text_tmpl = get_template('invoice/email/%s.txt' % template)
+            html_tmpl = get_template('invoice/email/%s.html' % template)
+
+            email_context = Context({
+                'invoice': self,
                 "SITE_NAME": settings.SITE_NAME,
                 "INV_CURRENCY": app_settings.INV_CURRENCY,
-                "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL,
-            })
+                "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL, })
+
+            text_content = text_tmpl.render(email_context)
+            html_content = html_tmpl.render(email_context)
+
+            email = EmailMultiAlternatives(subject=subject, body=text_content,
+                                           to=[to_email])
+            email.attach_alternative(html_content, "text/html")
             email.attach(attachment)
+            for img in images:
+                fp = open(join(settings.STATIC_ROOT, img[0]), 'rb')
+                msgImage = MIMEImage(fp.read())
+                fp.close()
+                msgImage.add_header('Content-ID', '<' + img[1] + '>')
+                email.attach(msgImage)
             email.send()
 
             self.invoiced = True
@@ -176,13 +201,13 @@ class InvoicePayment(models.Model):
     amount = models.DecimalField(_(u"amount"), max_digits=8,
                                  decimal_places=2)
     paid_date = models.DateField(_(u"paid date"), blank=True, null=True)
-    payment_method = models.CharField(_(u"payment method"), max_length=20,
-                                      choices=METHOD_CHOICES,
-                                      blank=True, null=True)
-    payment_additional_info = models.CharField(_(u"additional informations"),
-                                               max_length=20, blank=True,
-                                               null=True,
-                                               help_text=_(u"eg. payment id"))
+    method = models.CharField(_(u"payment method"), max_length=20,
+                              choices=METHOD_CHOICES,
+                              blank=True, null=True)
+    additional_info = models.CharField(_(u"additional informations"),
+                                       max_length=20, blank=True,
+                                       null=True,
+                                       help_text=_(u"eg. payment id"))
     creation_date = models.DateTimeField(_(u"date of creation"),
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
