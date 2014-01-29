@@ -141,6 +141,7 @@ class Invoice(TimeStampedModel):
 
             email_context = Context({
                 'invoice': self,
+                'date': date.today(),
                 "SITE_NAME": settings.SITE_NAME,
                 "INV_CURRENCY": app_settings.INV_CURRENCY,
                 "INV_CURRENCY_SYMBOL": app_settings.INV_CURRENCY_SYMBOL, })
@@ -152,12 +153,14 @@ class Invoice(TimeStampedModel):
                                            to=[to_email])
             email.attach_alternative(html_content, "text/html")
             email.attach(attachment)
+
             for img in images:
                 fp = open(join(settings.STATIC_ROOT, img[0]), 'rb')
                 msgImage = MIMEImage(fp.read())
                 fp.close()
                 msgImage.add_header('Content-ID', '<' + img[1] + '>')
                 email.attach(msgImage)
+
             email.send()
 
             self.invoiced = True
