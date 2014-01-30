@@ -79,7 +79,7 @@ Here, differents property which you can add to your model to set the billing add
 `invoice_address_one`, `invoice_address_two`, `invoice_town`, `invoice_county`, `invoice_postcode`, `invoice_contact_name`
 
 
-## Cutomize invoice numbering
+## Customize invoice numbering
 
 Add to  your `settings.py` :
 
@@ -88,4 +88,15 @@ Add to  your `settings.py` :
 This module must have a method called `encode` that take the invoice PK and return the invoice number :
 
     def encode(pk):
+        # ...
+
+## Customize invoice file naming
+
+Add to  your `settings.py` :
+
+    INV_NAME_MODULE = 'invoice_mod.naming'
+
+This module must have a method called `filename` that take the invoice object and return the invoice file name (with the extension) :
+
+    def filename(invoice):
         # ...

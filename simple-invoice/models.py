@@ -106,7 +106,8 @@ class Invoice(TimeStampedModel):
     total.short_description = _(u"total")
 
     def file_name(self):
-        return u'invoice_%s.pdf' % self.invoice_id
+        inv_name_module = importlib.import_module(app_settings.INV_NAME_MODULE)
+        return inv_name_module.filename(self)
 
     def generate_pdf(self):
         return draw_pdf(self.pdf_path(), self)
