@@ -13,6 +13,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
 from django.utils.translation import ugettext_lazy as _
+from django.core import urlresolvers
 try:
     from django.utils import importlib
 except ImportError:
@@ -60,6 +61,37 @@ class Invoice(TimeStampedModel):
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
                                              auto_now=True)
+    # Updated when the invoice is created
+    is_credit_note = models.BooleanField(_(u"Is credit note"), default=False,
+                                         editable=False)
+    invoice_related = models.OneToOneField("self", blank=True, null=True,
+                                           related_name="credit_note",
+                                           verbose_name=_(u'Invoice related'),
+                                           editable=False)
+
+    def credit_note_related_link(self):
+        if ((self.credit_note) and (not self.invoice_related) and
+           (not self.is_credit_note)):
+            change_url = urlresolvers.reverse('admin:invoice_invoice_change',
+                                              args=(self.credit_note.pk,))
+            return '<a href="%s">%s</a>' % (change_url,
+                                            self.credit_note.invoice_id)
+        else:
+            return self.invoice_id
+    credit_note_related_link.short_description = _(u"Credit note")
+    credit_note_related_link.allow_tags = True
+    credit_note_related_link.help_text = "lll"
+
+    def invoice_related_link(self):
+        if self.invoice_related and self.is_credit_note:
+            change_url = urlresolvers.reverse('admin:invoice_invoice_change',
+                                              args=(self.invoice_related.pk,))
+            return '<a href="%s">%s</a>' % (change_url,
+                                            self.invoice_related.invoice_id)
+        else:
+            return self.invoice_id
+    invoice_related_link.short_description = _(u"Invoice")
+    invoice_related_link.allow_tags = True
 
     objects = InvoiceManager()
 

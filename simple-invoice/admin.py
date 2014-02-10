@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.conf.urls import patterns
-from django.utils.translation import ugettext_lazy as _
+
 from invoice.models import Invoice, InvoiceItem, Currency, InvoicePayment
 from invoice.views import pdf_dl_view, pdf_gen_view
 from invoice.forms import InvoiceAdminForm
+from invoice.admin_actions import send_invoice, generate_credit_note
 
 
 class InvoiceItemInline(admin.TabularInline):
@@ -22,9 +23,16 @@ class InvoiceAdmin(admin.ModelAdmin):
             'fields': ['recipient', 'invoice_date', 'draft',
                        'currency', 'invoice_cost_code']
         }),
+        ('Credit Note', {
+            'classes': ('collapse', ),
+            'fields': ['is_credit_note', 'credit_note_related_link',
+                       'invoice_related_link']
+        })
     ]
-
+    readonly_fields = ['credit_note_related_link', 'is_credit_note',
+                       'invoice_related_link', ]
     search_fields = ('invoice_id',)
+    list_filter = ['invoice_date', 'invoiced', 'is_credit_note', ]
     list_display = (
         'invoice_id',
         'total_amount',
@@ -34,7 +42,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'invoiced',
     )
     form = InvoiceAdminForm
-    actions = ['send_invoice', ]
+    actions = [send_invoice, generate_credit_note, ]
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -55,13 +63,6 @@ class InvoiceAdmin(admin.ModelAdmin):
             (r'^(.+)/pdf/generate/$', wrapped_pdf_gen_view),
         ) + urls
         return urls
-
-    def send_invoice(self, request, queryset):
-        for invoice in queryset.all():
-            invoice.send_invoice()
-
-    send_invoice.short_description = _(u"Send invoice to client")
-
 
 admin.site.register(Invoice, InvoiceAdmin)
 admin.site.register(Currency)
