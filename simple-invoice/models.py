@@ -228,8 +228,8 @@ class InvoiceItem(models.Model):
 class InvoicePayment(models.Model):
 
     METHOD_CHOICES = (
-        ('cheque', _(u'Chèque')),
-        ('virement', _(u'Virement')),
+        ('cheque', _(u'cheque')),
+        ('virement', _(u'bank transfer')),
     )
 
     invoice = models.ForeignKey(Invoice, related_name='payments', unique=False,

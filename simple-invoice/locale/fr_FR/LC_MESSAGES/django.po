@@ -1,0 +1,174 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2014 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Thomas LOIRET <thomas.loiret@inextcom.fr>, 2014.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-10 17:49+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin_actions.py:13
+msgid "Send invoice to client"
+msgstr "Envoyer la facture au client"
+
+#: admin_actions.py:21
+#, python-format
+msgid "You cannot create a credit note for a credit note! (%s)"
+msgstr "Vous ne pouvez pas générer un avoir pour un avoir! (%s)"
+
+#: admin_actions.py:28
+#, python-format
+msgid "This invoice has already a credit note a credit note! (%s)"
+msgstr "Cette facture a déjà un avoir! (%s)"
+
+#: admin_actions.py:50
+msgid "Generate credit note"
+msgstr "Générer l'avoir"
+
+#: models.py:48
+msgid "recipient"
+msgstr "destinataire"
+
+#: models.py:50
+msgid "currency"
+msgstr "devise"
+
+#: models.py:51
+msgid "invoice ID"
+msgstr "numéro"
+
+#: models.py:53
+msgid "invoice date"
+msgstr "date"
+
+#: models.py:55
+msgid "cost accounting code"
+msgstr "code analytique"
+
+#: models.py:57
+msgid "invoiced"
+msgstr "envoyé"
+
+#: models.py:58
+msgid "draft"
+msgstr "brouillon"
+
+#: models.py:60 models.py:215 models.py:247
+msgid "date of creation"
+msgstr "date de création"
+
+#: models.py:62 models.py:217 models.py:249
+msgid "date of modification"
+msgstr "date de modification"
+
+#: models.py:65
+msgid "Is credit note"
+msgstr "Est-ce un avoir?"
+
+#: models.py:69
+msgid "Invoice related"
+msgstr "Facture liée"
+
+#: models.py:81
+msgid "Credit note"
+msgstr "Avoir"
+
+#: models.py:93
+msgid "Invoice"
+msgstr "Facture"
+
+#: models.py:115
+msgid "total amount"
+msgstr "montant total"
+
+#: models.py:122
+msgid "is paid?"
+msgstr "payé?"
+
+#: models.py:131
+msgid "last payment"
+msgstr "dernier paiement"
+
+#: models.py:138
+msgid "total"
+msgstr "total"
+
+#: models.py:209 models.py:236
+msgid "invoice"
+msgstr "facture"
+
+#: models.py:210
+msgid "description"
+msgstr "description"
+
+#: models.py:211
+msgid "unit price"
+msgstr "prix unitaire"
+
+#: models.py:213
+msgid "quantity"
+msgstr "quantité"
+
+#: models.py:231
+msgid "cheque"
+msgstr "chèque"
+
+#: models.py:232
+msgid "bank transfer"
+msgstr "virement"
+
+#: models.py:237
+msgid "amount"
+msgstr "montant"
+
+#: models.py:239
+msgid "paid date"
+msgstr "date du paiement"
+
+#: models.py:240
+msgid "payment method"
+msgstr "méthode de paiement"
+
+#: models.py:243
+msgid "additional informations"
+msgstr "informations supplémentaires"
+
+#: models.py:246
+msgid "eg. payment id"
+msgstr "ex: la banque"
+
+#: views.py:30
+msgid "You have to generate the PDF before!"
+msgstr "Vous devez générer le PDF avant de le télécharger!"
+
+#: views.py:38
+msgid "The PDF have been generated."
+msgstr "Le PDF a été généré."
+
+#: views.py:41
+msgid "Error, the PDF have not been generated."
+msgstr "Erreur, le PDF n'a pas été généré."
+
+#: templates/admin/invoice/invoice/change_form.html:7
+msgid ""
+"If the a PDF is already generated, it will be replaced. Are you sure to do "
+"this?"
+msgstr "Si le PDF est déjà généré, il sera remplacé. Etes vous sur?"
+
+#: templates/admin/invoice/invoice/change_form.html:8
+msgid "Generate PDF"
+msgstr "Générer le PDF"
+
+#: templates/admin/invoice/invoice/change_form.html:13
+msgid "Download PDF"
+msgstr "Télécharger le PDF"
