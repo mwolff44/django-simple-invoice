@@ -34,6 +34,10 @@ class Currency(models.Model):
     def __unicode__(self):
         return self.code
 
+    class Meta:
+        verbose_name = _(u"currency")
+        verbose_name_plural = _(u"currencies")
+
 
 class InvoiceManager(models.Manager):
     def get_invoiced(self):
@@ -103,6 +107,8 @@ class Invoice(TimeStampedModel):
 
     class Meta:
         ordering = ('-invoice_date', 'id')
+        verbose_name = _(u"invoice")
+        verbose_name_plural = _(u"invoices")
 
     def save(self, *args, **kwargs):
 
@@ -245,6 +251,10 @@ class InvoiceItem(models.Model):
     def __unicode__(self):
         return self.description
 
+    class Meta:
+        verbose_name = _(u"invoice item")
+        verbose_name_plural = _(u"invoice items")
+
 
 class InvoicePayment(models.Model):
 
@@ -272,6 +282,10 @@ class InvoicePayment(models.Model):
 
     def __unicode__(self):
         return self.amount
+
+    class Meta:
+        verbose_name = _(u"invoice payment")
+        verbose_name_plural = _(u"invoice payments")
 
 
 @receiver(post_save, sender=InvoicePayment)
