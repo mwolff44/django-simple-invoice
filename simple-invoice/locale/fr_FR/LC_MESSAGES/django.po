@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-02-10 17:49+0100\n"
+"POT-Creation-Date: 2014-02-11 11:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,115 +35,115 @@ msgstr "Cette facture a déjà un avoir! (%s)"
 msgid "Generate credit note"
 msgstr "Générer l'avoir"
 
-#: models.py:48
+#: models.py:50
 msgid "recipient"
 msgstr "destinataire"
 
-#: models.py:50
+#: models.py:52
 msgid "currency"
 msgstr "devise"
 
-#: models.py:51
+#: models.py:53
 msgid "invoice ID"
 msgstr "numéro"
 
-#: models.py:53
+#: models.py:55
 msgid "invoice date"
 msgstr "date"
 
-#: models.py:55
+#: models.py:57
 msgid "cost accounting code"
 msgstr "code analytique"
 
-#: models.py:57
+#: models.py:59
 msgid "invoiced"
 msgstr "envoyé"
 
-#: models.py:58
+#: models.py:60
 msgid "draft"
 msgstr "brouillon"
 
-#: models.py:60 models.py:215 models.py:247
+#: models.py:62 models.py:240 models.py:272
 msgid "date of creation"
 msgstr "date de création"
 
-#: models.py:62 models.py:217 models.py:249
+#: models.py:64 models.py:242 models.py:274
 msgid "date of modification"
 msgstr "date de modification"
 
-#: models.py:65
+#: models.py:67
 msgid "Is credit note"
 msgstr "Est-ce un avoir?"
 
-#: models.py:69
+#: models.py:71
 msgid "Invoice related"
 msgstr "Facture liée"
 
-#: models.py:81
+#: models.py:73
+msgid "is paid"
+msgstr "payé?"
+
+#: models.py:84
 msgid "Credit note"
 msgstr "Avoir"
 
-#: models.py:93
+#: models.py:96
 msgid "Invoice"
 msgstr "Facture"
 
-#: models.py:115
+#: models.py:144
 msgid "total amount"
 msgstr "montant total"
 
-#: models.py:122
-msgid "is paid?"
-msgstr "payé?"
-
-#: models.py:131
+#: models.py:156
 msgid "last payment"
 msgstr "dernier paiement"
 
-#: models.py:138
+#: models.py:163
 msgid "total"
 msgstr "total"
 
-#: models.py:209 models.py:236
+#: models.py:234 models.py:261
 msgid "invoice"
 msgstr "facture"
 
-#: models.py:210
+#: models.py:235
 msgid "description"
 msgstr "description"
 
-#: models.py:211
+#: models.py:236
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: models.py:213
+#: models.py:238
 msgid "quantity"
 msgstr "quantité"
 
-#: models.py:231
+#: models.py:256
 msgid "cheque"
 msgstr "chèque"
 
-#: models.py:232
+#: models.py:257
 msgid "bank transfer"
 msgstr "virement"
 
-#: models.py:237
+#: models.py:262
 msgid "amount"
 msgstr "montant"
 
-#: models.py:239
+#: models.py:264
 msgid "paid date"
 msgstr "date du paiement"
 
-#: models.py:240
+#: models.py:265
 msgid "payment method"
 msgstr "méthode de paiement"
 
-#: models.py:243
+#: models.py:268
 msgid "additional informations"
 msgstr "informations supplémentaires"
 
-#: models.py:246
+#: models.py:271
 msgid "eg. payment id"
 msgstr "ex: la banque"
 

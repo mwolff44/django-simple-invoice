@@ -14,6 +14,8 @@ from django.template.loader import get_template
 from django.template import Context
 from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 try:
     from django.utils import importlib
 except ImportError:
@@ -68,6 +70,7 @@ class Invoice(TimeStampedModel):
                                            related_name="credit_note",
                                            verbose_name=_(u'Invoice related'),
                                            editable=False)
+    is_paid = models.BooleanField(_(u"is paid"), editable=False, default=True)
 
     def credit_note_related_link(self):
         if ((self.credit_note) and (not self.invoice_related) and
@@ -102,25 +105,43 @@ class Invoice(TimeStampedModel):
         ordering = ('-invoice_date', 'id')
 
     def save(self, *args, **kwargs):
-        super(Invoice, self).save(*args, **kwargs)
 
+        # During the invoice creation we compute the ID with the pk (that's
+        # why we save the model before)
         if not self.invoice_id:
+            super(Invoice, self).save(*args, **kwargs)
             inv_id_module = importlib.import_module(app_settings.INV_ID_MODULE)
             self.invoice_id = inv_id_module.encode(self.pk)
             kwargs['force_insert'] = False
-            super(Invoice, self).save(*args, **kwargs)
+
+        # We check if the invoice is paid
+        is_paid = False
+        if self.is_credit_note:
+            # That a credit note, we consider it as "paid" since nobody need
+            # to pay for it
+            is_paid = True
+            self.invoice_related._update_is_paid()
+        else:
+            try:
+                self.credit_note
+                # There is a credit note for this invoice
+                is_paid = (self.credit_note.total() >= self.total())
+            except:
+                # No credit note
+                total_paid = 0
+                for payment in self.payments.all():
+                    total_paid += payment.amount
+                is_paid = (total_paid >= self.total())
+        self.is_paid = is_paid
+        super(Invoice, self).save(*args, **kwargs)
 
     def total_amount(self):
         return format_currency(self.total(), self.currency)
     total_amount.short_description = _(u"total amount")
 
-    def is_paid(self):
-        total_paid = 0
-        for payment in self.payments.all():
-            total_paid += payment.amount
-        return (total_paid >= self.total())
-    is_paid.short_description = _(u"is paid?")
-    is_paid.boolean = True
+    def _update_is_paid(self):
+        # Call the save() method in order to compute is the invoice is paid
+        self.save()
 
     def last_payment(self):
         payments = self.payments.order_by('-paid_date')
@@ -248,3 +269,30 @@ class InvoicePayment(models.Model):
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
                                              auto_now=True)
+
+    def __unicode__(self):
+        return self.amount
+
+
+@receiver(post_save, sender=InvoicePayment)
+def payment_saved(sender, instance, using, **kwargs):
+    payment = instance
+    payment.invoice._update_is_paid()
+
+
+@receiver(post_delete, sender=InvoicePayment)
+def payment_deleted(sender, instance, using, **kwargs):
+    payment = instance
+    payment.invoice._update_is_paid()
+
+
+@receiver(post_save, sender=InvoiceItem)
+def item_saved(sender, instance, using, **kwargs):
+    item = instance
+    item.invoice._update_is_paid()
+
+
+@receiver(post_delete, sender=InvoiceItem)
+def item_deleted(sender, instance, using, **kwargs):
+    item = instance
+    item.invoice._update_is_paid()

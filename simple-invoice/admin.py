@@ -32,7 +32,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     readonly_fields = ['credit_note_related_link', 'is_credit_note',
                        'invoice_related_link', ]
     search_fields = ('invoice_id',)
-    list_filter = ['invoice_date', 'invoiced', 'is_credit_note', ]
+    list_filter = ['invoice_date', 'invoiced', 'is_credit_note', 'is_paid', ]
     list_display = (
         'invoice_id',
         'total_amount',
