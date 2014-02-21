@@ -272,7 +272,7 @@ class InvoicePayment(models.Model):
                               choices=METHOD_CHOICES,
                               blank=True, null=True)
     additional_info = models.CharField(_(u"additional informations"),
-                                       max_length=20, blank=True,
+                                       max_length=100, blank=True,
                                        null=True,
                                        help_text=_(u"eg. payment id"))
     creation_date = models.DateTimeField(_(u"date of creation"),
