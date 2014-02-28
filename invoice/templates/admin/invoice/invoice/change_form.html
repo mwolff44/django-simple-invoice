@@ -3,14 +3,14 @@
 
 {% block object-tools-items %}
 {{ block.super }}
-<div class="span2">
-    <a href="pdf/generate" class="big-button" onclick="return confirm('{% trans "If the a PDF is already generated, it will be replaced. Are you sure to do this?" %}')">
-        <i class="reload-item"></i>{% trans "Generate PDF" %}{{invoice.pk}}
+<li>
+    <a href="pdf/generate" onclick="return confirm('{% trans "If the a PDF is already generated, it will be replaced. Are you sure to do this?" %}')">
+       {% trans "Generate PDF" %}
     </a>
-</div>
-<div class="span2">
-    <a href="pdf/download/" class="big-button">
-        <i class="download-item"></i>{% trans "Download PDF" %}
+</li>
+<li>
+    <a href="pdf/download/">
+        {% trans "Download PDF" %}
     </a>
-</div>
+</li>
 {% endblock %}

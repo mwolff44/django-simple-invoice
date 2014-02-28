@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from invoice.models import Invoice
 from invoice.pdf import draw_pdf
 from invoice.utils import pdf_response
+from invoice.export import export
 
 from os.path import getsize
 from django.core.servers.basehttp import FileWrapper
@@ -46,3 +47,21 @@ def pdf_gen_view(request, pk):
 def pdf_user_view(request, invoice_id):
     invoice = get_object_or_404(Invoice, invoice_id=invoice_id)
     return pdf_response(draw_pdf, invoice.file_name(), invoice)
+
+
+def export_view(request):
+    try:
+        fileurl = export(test=False)
+        return HttpResponseRedirect(fileurl)
+    except Exception, e:
+        messages.add_message(request, messages.ERROR, e)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def export_test_view(request):
+    try:
+        fileurl = export(test=True)
+        return HttpResponseRedirect(fileurl)
+    except Exception, e:
+        messages.add_message(request, messages.ERROR, e)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

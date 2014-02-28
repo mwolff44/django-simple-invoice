@@ -50,6 +50,12 @@ class InvoiceManager(models.Manager):
 
 
 class Invoice(TimeStampedModel):
+    EXPORTED_CHOICES = (
+        ('no', _(u'no')),
+        ('invoice_only', _(u'Invoice only')),
+        ('yes', _(u'yes')),
+    )
+
     recipient = models.ForeignKey(app_settings.INV_CLIENT_MODULE,
                                   verbose_name=_(u'recipient'))
     currency = models.ForeignKey(Currency, blank=True, null=True,
@@ -75,6 +81,9 @@ class Invoice(TimeStampedModel):
                                            verbose_name=_(u'Invoice related'),
                                            editable=False)
     is_paid = models.BooleanField(_(u"is paid"), editable=False, default=True)
+    is_exported = models.CharField(max_length=20, editable=False,
+                                   choices=EXPORTED_CHOICES,
+                                   default='no')
 
     def credit_note_related_link(self):
         if ((self.credit_note) and (not self.invoice_related) and
@@ -87,7 +96,6 @@ class Invoice(TimeStampedModel):
             return self.invoice_id
     credit_note_related_link.short_description = _(u"Credit note")
     credit_note_related_link.allow_tags = True
-    credit_note_related_link.help_text = "lll"
 
     def invoice_related_link(self):
         if self.invoice_related and self.is_credit_note:
@@ -267,7 +275,7 @@ class InvoicePayment(models.Model):
                                 verbose_name=_(u'invoice'))
     amount = models.DecimalField(_(u"amount"), max_digits=8,
                                  decimal_places=2)
-    paid_date = models.DateField(_(u"paid date"), blank=True, null=True)
+    paid_date = models.DateField(_(u"paid date"), default=date.today())
     method = models.CharField(_(u"payment method"), max_length=20,
                               choices=METHOD_CHOICES,
                               blank=True, null=True)
@@ -275,6 +283,8 @@ class InvoicePayment(models.Model):
                                        max_length=100, blank=True,
                                        null=True,
                                        help_text=_(u"eg. payment id"))
+    is_exported = models.BooleanField(_(u"Is exported"), default=False,
+                                      editable=False)
     creation_date = models.DateTimeField(_(u"date of creation"),
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
@@ -310,3 +320,13 @@ def item_saved(sender, instance, using, **kwargs):
 def item_deleted(sender, instance, using, **kwargs):
     item = instance
     item.invoice._update_is_paid()
+
+
+class Export(models.Model):
+    date = models.DateField(_(u"date"))
+    file = models.FileField(_(u"file"), upload_to='invoices/export')
+
+    creation_date = models.DateTimeField(_(u"date of creation"),
+                                         auto_now_add=True)
+    modification_date = models.DateTimeField(_(u"date of modification"),
+                                             auto_now=True)

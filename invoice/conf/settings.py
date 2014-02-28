@@ -18,3 +18,5 @@ INV_PDF_DIR = getattr(settings, 'INV_PDF_DIR',
                       path.join(settings.MEDIA_ROOT, 'invoices/pdf/'))
 INV_NAME_MODULE = getattr(settings, 'INV_NAME_MODULE',
                           'invoice.utils.naming')
+INV_EXPORT_MODULE = getattr(settings, 'INV_EXPORT_MODULE',
+                            'invoice.export_example')

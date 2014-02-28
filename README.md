@@ -81,7 +81,7 @@ Here, differents property which you can add to your model to set the billing add
 
 ## Customize invoice numbering
 
-Add to  your `settings.py` :
+Add to your `settings.py` :
 
     INV_ID_MODULE = 'invoice_mod.numbering'
 
@@ -92,7 +92,7 @@ This module must have a method called `encode` that take the invoice PK and retu
 
 ## Customize invoice file naming
 
-Add to  your `settings.py` :
+Add to your `settings.py` :
 
     INV_NAME_MODULE = 'invoice_mod.naming'
 
@@ -100,3 +100,32 @@ This module must have a method called `filename` that take the invoice object an
 
     def filename(invoice):
         # ...
+
+
+## Customize invoice export
+
+If you want to use the export feature, add to your `settings.py` :
+
+    INV_EXPORT_MODULE = 'invoice_mod.export'
+
+This module must have a method called `gather_data_and_update_flags`. The method's goal is to return a list of rows and update flags (`is_exported`). It takes one argument `test`, if `True` you shouldn't update flag. Here is a dummy example:
+
+    def gather_data_and_update_flags(test):
+        invoices = Invoice.objects.filter(is_exported__in=('invoice_only',
+                                                           'no'))
+        data = []
+        for invoice in invoices:
+            # Dummy example, you have to implement it yourself ;)
+            data.append([invoice.invoice_date, invoice.total(), ])
+            if not test:
+                invoice.is_exported = 'yes'
+        return data
+
+Example of data returned:
+
+    data = [('2014-02-05', '200.00'), ('2014-02-20', '500.00'), ]
+
+It will be your job to manage the `is_exported` fields for `Invoice` and `InvoicePayment`. There is three choices for `Invoice.is_exported`:
+- `no` : Ǹothing from that invoice has been exported
+- `invoice_only` : The invoice (aka. the items) has been exported, but not the payments
+- `yes` : Everything has been exported, invoice and payments

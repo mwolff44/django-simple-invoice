@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from django.conf.urls import patterns
+from django.conf.urls import patterns, url
 
-from invoice.models import Invoice, InvoiceItem, Currency, InvoicePayment
-from invoice.views import pdf_dl_view, pdf_gen_view
+from invoice.models import Invoice, InvoiceItem, Currency, InvoicePayment,\
+    Export
+from invoice.views import pdf_dl_view, pdf_gen_view, export_view,\
+    export_test_view
 from invoice.forms import InvoiceAdminForm
 from invoice.admin_actions import send_invoice, generate_credit_note
 
@@ -64,5 +66,25 @@ class InvoiceAdmin(admin.ModelAdmin):
         ) + urls
         return urls
 
+
+class ExportAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk', 'date',
+    )
+
+    def get_urls(self):
+        urls = super(ExportAdmin, self).get_urls()
+        wrapped_export_view = self.admin_site.admin_view(export_view)
+        wrapped_export_test_view = self.admin_site.admin_view(export_test_view)
+        urls = patterns(
+            '',
+            url(r'^do_it/$', wrapped_export_view, name='export_accounts'),
+            url(r'^do_it/test$', wrapped_export_test_view,
+                name='export_accounts_test'),
+        ) + urls
+        return urls
+
+
 admin.site.register(Invoice, InvoiceAdmin)
 admin.site.register(Currency)
+admin.site.register(Export, ExportAdmin)
