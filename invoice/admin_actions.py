@@ -33,7 +33,8 @@ def generate_credit_note(self, request, queryset):
             pass
         credit_note = Invoice(recipient=invoice.recipient,
                               is_credit_note=True,
-                              invoice_related=invoice)
+                              invoice_related=invoice,
+                              invoice_cost_code=invoice.invoice_cost_code)
         credit_note.save()
         last_credite_note_created = credit_note
         for invoice_item in invoice.items.all():
