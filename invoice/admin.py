@@ -31,8 +31,19 @@ class InvoiceAdmin(admin.ModelAdmin):
                        'invoice_related_link']
         })
     ]
+
     readonly_fields = ['credit_note_related_link', 'is_credit_note',
                        'invoice_related_link', ]
+
+    def get_readonly_fields(self, request, obj=None):
+        if hasattr(obj, 'is_exported'):
+            if obj.is_exported in ('invoice_only', 'yes'):
+                return ['credit_note_related_link', 'is_credit_note',
+                        'invoice_related_link', 'recipient', 'invoice_date',
+                        'draft', 'currency', 'invoice_cost_code']
+        return ['credit_note_related_link', 'is_credit_note',
+                'invoice_related_link', ]
+
     search_fields = ('invoice_id',)
     list_filter = ['invoice_date', 'invoiced', 'is_credit_note', 'is_paid', ]
     list_display = (
@@ -71,6 +82,7 @@ class ExportAdmin(admin.ModelAdmin):
     list_display = (
         'pk', 'date',
     )
+    readonly_fields = ['date', 'file', ]
 
     def get_urls(self):
         urls = super(ExportAdmin, self).get_urls()
