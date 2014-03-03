@@ -78,8 +78,5 @@ def gather_data_and_update_flags(*args, **kwargs):
         logger.error(u"%s" % _(u"Export module not found! %s " %
                                inv_settings.INV_EXPORT_MODULE))
         raise Exception(u"%s" % _(u"Export module not found!"))
-    try:
-        return data_module.gather_data_and_update_flags(*args, **kwargs)
-    except Exception, e:
-        logger.error(u"%s" % _(u"Error when fetching data - %s" % e))
-        return False
+
+    return data_module.gather_data_and_update_flags(*args, **kwargs)
