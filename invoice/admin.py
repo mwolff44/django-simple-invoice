@@ -82,7 +82,8 @@ class ExportAdmin(admin.ModelAdmin):
     list_display = (
         'pk', 'date',
     )
-    readonly_fields = ['date', 'file', ]
+    readonly_fields = ['date', 'file_link', ]
+    exclude = ['file', ]
 
     def get_urls(self):
         urls = super(ExportAdmin, self).get_urls()

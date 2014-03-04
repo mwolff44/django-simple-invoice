@@ -330,3 +330,14 @@ class Export(models.Model):
                                          auto_now_add=True)
     modification_date = models.DateTimeField(_(u"date of modification"),
                                              auto_now=True)
+
+    def file_link(self):
+        if self.file:
+            file_url = "%s%s" % (settings.MEDIA_URL, self.file)
+
+            return '<a href="%s">%s</a>' % (file_url,
+                                            self.file)
+        else:
+            return self.file
+    file_link.short_description = _(u"file")
+    file_link.allow_tags = True
