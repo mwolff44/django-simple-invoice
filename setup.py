@@ -20,9 +20,9 @@ setup(
     name='simple-invoice',
     version=find_version('invoice', '__init__.py'),
     description='Invoicing for Django',
-    author='inextcom',
-    author_email='contact@inextcom.fr',
-    url='https://bitbucket.org/inextcom/django-simple-invoice',
+    author='tloiret',
+    author_email='mathiaswolff@mac.com',
+    url='https://bitbucket.org/mwolff/django-simple-invoice',
     packages=find_packages(),
     zip_safe=False,
     package_data={

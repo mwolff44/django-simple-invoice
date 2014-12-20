@@ -5,6 +5,8 @@ Django Simple Invoice
 
 Django-simple-invoice is a fork of [django-invoice (by simonluijk)](https://github.com/simonluijk/django-invoice "django-invoice (by simonluijk)") which works without django-addressbook.
 
+The initial version (up to 0.2.1) has been written by [Thomas LOIRET](https://bitbucket.org/tloiret "Thomas LOIRET").
+
 # Requirements
 
 * Python (2.6, 2.7)
