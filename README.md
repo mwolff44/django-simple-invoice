@@ -7,17 +7,15 @@ Django-simple-invoice is a fork of [django-invoice (by simonluijk)](https://gith
 
 The initial version (up to 0.3.1) has been written by [Thomas LOIRET](https://bitbucket.org/tloiret "Thomas LOIRET").
 
-.. image:: https://pypip.in/v/django-simple-invoice/badge.png?style=flat
-    :target: https://pypi.python.org/pypi/django-simple-invoice/
-    :alt: Latest PyPI version
 
-.. image:: https://pypip.in/py_versions/django-simple-invoice/badge.png?style=flat
-    :target: https://pypi.python.org/pypi/django-simple-invoice/
-    :alt: Supported Python versions
+[![Latest PyPi Version](https://pypip.in/version/django-simple-invoice/badge.svg?style=flat)](https://pypi.python.org/pypi/django-simple-invoice/)
 
-.. image:: https://pypip.in/d/django-simple-invoice/badge.png?style=flat
-    :target: https://pypi.python.org/pypi/django-simple-invoice/
-    :alt: Number of PyPI downloads
+[![Supported Python versions](https://pypip.in/py_versions/django-simple-invoice/badge.png?style=flat)](https://pypi.python.org/pypi/django-simple-invoice/)
+
+[![Number of PyPI downloads](https://pypip.in/d/django-simple-invoice/badge.png?style=flat)](https://pypi.python.org/pypi/django-simple-invoice/)
+
+[![License](https://pypip.in/license/django-simple-invoice/badge.png?style=flat)](https://pypi.python.org/pypi/django-simple-invoice/)
+
 
 # Requirements
 
