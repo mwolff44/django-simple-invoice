@@ -89,7 +89,7 @@ Add to your `settings.py` :
 
 This module must have a method called `encode` that take the invoice PK and return the invoice number :
 
-    def encode(pk):
+    def encode(pk, number):
         # ...
 
 ## Customize invoice file naming

@@ -60,6 +60,7 @@ class Invoice(TimeStampedModel):
                                   verbose_name=_(u'recipient'))
     currency = models.ForeignKey(Currency, blank=True, null=True,
                                  verbose_name=_(u'currency'))
+    number = models.IntegerField(_(u'number'), db_index=True, blank=True, default=0)
     invoice_id = models.CharField(_(u'invoice ID'), unique=True, max_length=10,
                                   null=True, blank=True, editable=False)
     invoice_date = models.DateField(_(u'invoice date'), default=date.today)
@@ -125,7 +126,8 @@ class Invoice(TimeStampedModel):
         if not self.invoice_id:
             super(Invoice, self).save(*args, **kwargs)
             inv_id_module = importlib.import_module(app_settings.INV_ID_MODULE)
-            self.invoice_id = inv_id_module.encode(self.pk)
+            self.number = self._get_next_number()
+            self.invoice_id = inv_id_module.encode(self.pk, self.number)
             kwargs['force_insert'] = False
 
         # We check if the invoice is paid
@@ -148,6 +150,29 @@ class Invoice(TimeStampedModel):
                 is_paid = (total_paid >= self.total())
         self.is_paid = is_paid
         super(Invoice, self).save(*args, **kwargs)
+
+    def _get_next_number(self):
+        """
+        Returnes next invoice number - reset yearly.
+
+        .. warning::
+
+            This is only used to prepopulate ``number`` field on saving new invoice.
+            To get invoice number always use ``number`` field.
+
+        .. note::
+
+            To get invoice full number use ``invoice_id`` field.
+
+        :return: string (generated next number)
+        """
+
+        # Recupere les facture de l annee
+        relative_invoices = Invoice.objects.filter(invoice_date__year=self.invoice_date.year)
+        # on prend le numero le plus eleve du champs number, sinon on met 0
+        last_number = relative_invoices.aggregate(Max('number'))['number__max'] or 0
+
+        return last_number + 1
 
     def total_amount(self):
         return format_currency(self.total(), self.currency)
