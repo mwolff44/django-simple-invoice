@@ -20,8 +20,12 @@ setup(
     name='simple-invoice',
     version=find_version('invoice', '__init__.py'),
     description='Invoicing for Django',
-    author='tloiret',
+    author='Thomas Loiret, Mathias Wolff',
     author_email='mathiaswolff@mac.com',
+    description=("Invoicing application for Django"),
+    license="GPL v3",
+    long_description=read('README.md'),
+    keywords="invoice django application pdf"
     url='https://bitbucket.org/mwolff/django-simple-invoice',
     packages=find_packages(),
     zip_safe=False,
