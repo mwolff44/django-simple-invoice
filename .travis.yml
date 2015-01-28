@@ -11,8 +11,8 @@ install:
   - pip install pep8 --use-mirrors
   - pip install pyflakes --use-mirrors
   - pip install -q -e . --use-mirrors
-before_script:
+#before_script:
 #  - "pep8 --exclude=migrations --ignore=E501,E225 invoice"
-  - pyflakes -x W invoice
+#  - pyflakes -x W invoice
 script:
   - python setup.py test
