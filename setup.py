@@ -17,7 +17,7 @@ def find_version(*file_paths):
 
 
 setup(
-    name='simple-invoice',
+    name='django-simple-invoice',
     version=find_version('invoice', '__init__.py'),
     description='Invoicing application for Django',
     author='Thomas Loiret, Mathias Wolff',

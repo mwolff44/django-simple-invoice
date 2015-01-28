@@ -1,11 +1,23 @@
 Django Simple Invoice
-==============
+=====================
 
 # Overview
 
 Django-simple-invoice is a fork of [django-invoice (by simonluijk)](https://github.com/simonluijk/django-invoice "django-invoice (by simonluijk)") which works without django-addressbook.
 
 The initial version (up to 0.3.1) has been written by [Thomas LOIRET](https://bitbucket.org/tloiret "Thomas LOIRET").
+
+.. image:: https://pypip.in/v/django-simple-invoice/badge.png?style=flat
+    :target: https://pypi.python.org/pypi/django-simple-invoice/
+    :alt: Latest PyPI version
+
+.. image:: https://pypip.in/py_versions/django-simple-invoice/badge.png?style=flat
+    :target: https://pypi.python.org/pypi/django-simple-invoice/
+    :alt: Supported Python versions
+
+.. image:: https://pypip.in/d/django-simple-invoice/badge.png?style=flat
+    :target: https://pypi.python.org/pypi/django-simple-invoice/
+    :alt: Number of PyPI downloads
 
 # Requirements
 
@@ -128,6 +140,6 @@ Example of data returned:
     data = [('2014-02-05', '200.00'), ('2014-02-20', '500.00'), ]
 
 It will be your job to manage the `is_exported` fields for `Invoice` and `InvoicePayment`. There is three choices for `Invoice.is_exported`:
-- `no` : Ǹothing from that invoice has been exported
+- `no` : Nothing from that invoice has been exported
 - `invoice_only` : The invoice (aka. the items) has been exported, but not the payments
 - `yes` : Everything has been exported, invoice and payments
