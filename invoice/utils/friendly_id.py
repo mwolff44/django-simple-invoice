@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """ Generates and decodes an unique invoice id, which can use characters
     to shorten its length.
@@ -42,7 +42,7 @@ OFFSET = getattr(settings, 'FRIENDLY_ID_OFFSET', SIZE / 2 - 1)
 # You may wish to remove letters that sound similar, to avoid confusion when a
 # customer calls on the phone (B/P, M/N, 3/C/D/E/G/T/V)
 VALID_CHARS = getattr(settings, 'FRIENDLY_ID_VALID_CHARS',
-                                        "3456789ACDEFGHJKLQRSTUVWXY")
+                      "3456789ACDEFGHJKLQRSTUVWXY")
 # Don't set this if you don't know what you're doing, you run the risk
 # It can be used to mix up the strings differently to how others using this code
 # would, but be careful to pick a factor of SIZE.
@@ -65,10 +65,10 @@ def find_suitable_period():
     # low (eg 2) and the period is too small.
     # We would prefer it to be lower than the number of VALID_CHARS, but more
     # than say 4.
-    starting_point = len(VALID_CHARS) > 14 and len(VALID_CHARS)/2 or 13
+    starting_point = len(VALID_CHARS) > 14 and len(VALID_CHARS) / 2 or 13
     for p in range(starting_point, 7, -1) \
-                + range(highest_acceptable_factor, starting_point+1, -1) \
-                + [6,5,4,3,2]:
+                + range(highest_acceptable_factor, starting_point + 1, -1) \
+                + [6, 5, 4, 3, 2]:
         if SIZE % p == 0:
             return p
     raise Exception, "No valid period could be found for SIZE=%d.\n" \
@@ -83,7 +83,7 @@ def perfect_hash(num):
     """ Translate a number to another unique number, using a perfect hash function.
         Only meaningful where 0 <= num <= SIZE.
     """
-    return ((num+OFFSET)*(SIZE/PERIOD)) % (SIZE+1) + 1
+    return ((num + OFFSET) * (SIZE / PERIOD)) % (SIZE + 1) + 1
 
 
 def friendly_number(num):
@@ -98,10 +98,10 @@ def friendly_number(num):
     # The length of the string can be determined by STRING_LENGTH or by how many
     # characters are necessary to present a base 30 representation of SIZE.
     while STRING_LENGTH and len(string) <= STRING_LENGTH \
-                or len(VALID_CHARS)**len(string) <= SIZE:
+        or len(VALID_CHARS) ** len(string) <= SIZE:
         # PREpend string (to remove all obvious signs of order)
-        string = VALID_CHARS[num%len(VALID_CHARS)] + string
-        num = num/len(VALID_CHARS)
+        string = VALID_CHARS[num % len(VALID_CHARS)] + string
+        num = num / len(VALID_CHARS)
     return string
 
 
@@ -110,7 +110,9 @@ def encode(num):
         more user friendly string of characters.
     """
     # Check the number is within our working range
-    if num > SIZE: return None
-    if num < 0: return None
+    if num > SIZE: 
+        return None
+    if num < 0: 
+        return None
 
     return friendly_number(perfect_hash(num))
