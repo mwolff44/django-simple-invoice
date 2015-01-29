@@ -67,8 +67,8 @@ def find_suitable_period():
     # than say 4.
     starting_point = len(VALID_CHARS) > 14 and len(VALID_CHARS) / 2 or 13
     for p in range(starting_point, 7, -1) \
-                + range(highest_acceptable_factor, starting_point + 1, -1) \
-                + [6, 5, 4, 3, 2]:
+                   + range(highest_acceptable_factor, starting_point + 1, -1) \
+                   + [6, 5, 4, 3, 2]:
         if SIZE % p == 0:
             return p
     raise Exception, "No valid period could be found for SIZE=%d.\n" \
@@ -98,7 +98,7 @@ def friendly_number(num):
     # The length of the string can be determined by STRING_LENGTH or by how many
     # characters are necessary to present a base 30 representation of SIZE.
     while STRING_LENGTH and len(string) <= STRING_LENGTH \
-        or len(VALID_CHARS) ** len(string) <= SIZE:
+            or len(VALID_CHARS) ** len(string) <= SIZE:
         # PREpend string (to remove all obvious signs of order)
         string = VALID_CHARS[num % len(VALID_CHARS)] + string
         num = num / len(VALID_CHARS)
@@ -110,9 +110,9 @@ def encode(num):
         more user friendly string of characters.
     """
     # Check the number is within our working range
-    if num > SIZE: 
+    if num > SIZE:
         return None
-    if num < 0: 
+    if num < 0:
         return None
 
     return friendly_number(perfect_hash(num))
