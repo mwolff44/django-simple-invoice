@@ -16,8 +16,7 @@ before_script:
   - "pep8 --exclude=migrations --ignore=E501 invoice"
   - pyflakes invoice
 script:
-  - python tests.py
-  - coverage run tests.py
+  - coverage run manage.py test
 after_success: 
   - pip install coveralls
   - coveralls
