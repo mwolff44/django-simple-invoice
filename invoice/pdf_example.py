@@ -3,10 +3,10 @@ from reportlab.platypus import Table
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 
-try:
-    from django.utils import importlib
-except ImportError:
-    import importlib
+# try:
+#     from django.utils import importlib
+# except ImportError:
+#     import importlib
 
 from invoice.conf import settings
 from invoice.utils import format_currency
