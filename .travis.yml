@@ -14,7 +14,7 @@ install:
   - pip install pyflakes --use-mirrors
 before_script:
   - "pep8 --exclude=migrations --ignore=E501 invoice"
-  - pyflakes --exclude=migrations invoice
+  - pyflakes `find invoice/* | egrep -v migrations`
 script:
   - coverage run manage.py test
 after_success: 
