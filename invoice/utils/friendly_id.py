@@ -67,12 +67,12 @@ def find_suitable_period():
     # than say 4.
     starting_point = len(VALID_CHARS) > 14 and len(VALID_CHARS) / 2 or 13
     for p in range(starting_point, 7, -1) \
-                   + range(highest_acceptable_factor, starting_point + 1, -1) \
-                   + [6, 5, 4, 3, 2]:
+            + range(highest_acceptable_factor, starting_point + 1, -1) \
+            + [6, 5, 4, 3, 2]:
         if SIZE % p == 0:
             return p
-    raise Exception, "No valid period could be found for SIZE=%d.\n" \
-                     "Try avoiding prime numbers :-)" % SIZE
+    raise Exception("No valid period could be found for SIZE=%d.\n" \
+                     "Try avoiding prime numbers" % SIZE)
 
 # Set the period if it is missing
 if not PERIOD:
