@@ -71,8 +71,8 @@ def find_suitable_period():
             + [6, 5, 4, 3, 2]:
         if SIZE % p == 0:
             return p
-    raise Exception("No valid period could be found for SIZE=%d.\n" \
-                     "Try avoiding prime numbers" % SIZE)
+    raise Exception("No valid period could be found for SIZE=%d.\n"
+        "Try avoiding prime numbers" % SIZE)
 
 # Set the period if it is missing
 if not PERIOD:
