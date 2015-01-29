@@ -9,14 +9,15 @@ env:
 install:
   - pip install argparse --use-mirrors
   - pip install -q Django==$DJANGO --use-mirrors
+  - pip install -r requirements/requirements.txt
   - pip install coverage
   - pip install pep8 --use-mirrors
   - pip install pyflakes --use-mirrors
 before_script:
   - "pep8 --exclude=migrations --ignore=E501 invoice"
-  - pyflakes `find invoice/* | egrep -v migrations | egrep -v locale | egrep -v templates`
+  - pyflakes `find invoice/* | egrep -v migrations | egrep -v locale | egrep -v templates | egrep -v requirements`
 script:
-  - python manage.py test
+  - "cd invoice;python manage.py test"
 after_success: 
   - pip install coveralls
   - coveralls
