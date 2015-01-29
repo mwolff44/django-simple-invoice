@@ -18,7 +18,7 @@ before_script:
   - "pep8 --exclude=migrations --ignore=E501 invoice"
   - pyflakes `find invoice/* | egrep -v migrations | egrep -v locale | egrep -v templates | egrep -v requirements`
 script:
-  - "cd invoice;python manage.py test"
+  - python manage.py test
 after_success: 
   - pip install coveralls
   - coveralls
