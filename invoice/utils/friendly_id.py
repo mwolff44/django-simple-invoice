@@ -19,7 +19,7 @@ Description: Invoice numbers like "0000004" are unprofessional in that they
 
 """
 import math
-import warnings
+# import warnings
 
 try:
     from django.conf import settings

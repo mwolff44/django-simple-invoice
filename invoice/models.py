@@ -7,6 +7,7 @@ from email.MIMEImage import MIMEImage
 from os.path import join, isfile
 
 from django.db import models
+from django.db.models import Max
 from django.conf import settings
 from django_extensions.db.models import TimeStampedModel
 from django.core.mail import EmailMultiAlternatives
