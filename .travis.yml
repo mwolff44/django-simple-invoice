@@ -7,15 +7,17 @@ env:
   - DJANGO=1.6
   - DJANGO=1.7
 install:
+  - pip install argparse --use-mirrors
   - pip install -q Django==$DJANGO --use-mirrors
+  - pip install coverage
   - pip install pep8 --use-mirrors
   - pip install pyflakes --use-mirrors
-  - pip install -q -e . --use-mirrors
-  - pip install coveralls
-#before_script:
-#  - "pep8 --exclude=migrations --ignore=E501,E225 invoice"
-#  - pyflakes -x W invoice
+before_script:
+  - "pep8 --exclude=migrations --ignore=E501 invoice"
+  - pyflakes invoice
 script:
-  - python setup.py test
-  - coverage run manage.py test
-after_success: coveralls
+  - python tests.py
+  - coverage run tests.py
+after_success: 
+  - pip install coveralls
+  - coveralls

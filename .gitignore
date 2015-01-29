@@ -2,3 +2,6 @@
 *.swp
 *.log
 *.egg-info/*
+.DS_Store
+docs/_build/
+.coverage
