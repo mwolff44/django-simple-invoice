@@ -2,6 +2,7 @@
 *.swp
 *.log
 *.egg-info/*
+*.sublime-*
 .DS_Store
 docs/_build/
 .coverage
