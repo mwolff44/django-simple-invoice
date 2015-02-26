@@ -25,7 +25,7 @@ setup(
     license="GPL v3",
     long_description="details are available in README.md file",
     keywords="invoice django application pdf",
-    url='https://github.com/mwolff/django-simple-invoice',
+    url='https://github.com/mwolff44/django-simple-invoice',
     packages=find_packages(),
     zip_safe=False,
     package_data={

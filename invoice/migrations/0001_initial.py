@@ -4,6 +4,10 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+from .conf import settings as app_settings
+company_orm_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.object_name)
+company_model_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.module_name)
+
 
 class Migration(SchemaMigration):
 
@@ -22,13 +26,18 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('recipient', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['adherents.Organization'])),
+            ('recipient', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[company_orm_label])),
+            ('number', self.gf('django.db.models.fields.IntegerField')(default=0, db_index=True, blank=True)),
             ('currency', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['invoice.Currency'], null=True, blank=True)),
             ('invoice_id', self.gf('django.db.models.fields.CharField')(max_length=10, unique=True, null=True, blank=True)),
             ('invoice_date', self.gf('django.db.models.fields.DateField')(default=datetime.date.today)),
             ('invoice_cost_code', self.gf('django.db.models.fields.CharField')(max_length=10, null=True, blank=True)),
             ('invoiced', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('draft', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('is_credit_note', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('is_paid', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('is_exported', self.gf('django.db.models.fields.CharField')(default='no', max_length=20)),
+            ('invoice_related', self.gf('django.db.models.fields.related.OneToOneField')(blank=True, related_name='credit_note', unique=True, null=True, to=orm['invoice.Invoice'])),
             ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modification_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
@@ -51,13 +60,24 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(related_name='payments', to=orm['invoice.Invoice'])),
             ('amount', self.gf('django.db.models.fields.DecimalField')(max_digits=8, decimal_places=2)),
-            ('paid_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('paid_date', self.gf('django.db.models.fields.DateField')()),
             ('method', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
-            ('additional_info', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True)),
+            ('additional_info', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
+            ('is_exported', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modification_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
         db.send_create_signal(u'invoice', ['InvoicePayment'])
+
+        # Adding model 'Export'
+        db.create_table(u'invoice_export', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('date', self.gf('django.db.models.fields.DateField')()),
+            ('file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+            ('creation_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('modification_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+        ))
+        db.send_create_signal(u'invoice', ['Export'])
 
 
     def backwards(self, orm):
@@ -73,6 +93,9 @@ class Migration(SchemaMigration):
         # Deleting model 'InvoicePayment'
         db.delete_table(u'invoice_invoicepayment')
 
+        # Deleting model 'Export'
+        db.delete_table(u'invoice_export')
+
 
     models = {
         u'invoice.currency': {
@@ -81,6 +104,14 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'post_symbol': ('django.db.models.fields.CharField', [], {'max_length': '1', 'blank': 'True'}),
             'pre_symbol': ('django.db.models.fields.CharField', [], {'max_length': '1', 'blank': 'True'})
+        },
+        u'invoice.export': {
+            'Meta': {'object_name': 'Export'},
+            'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date': ('django.db.models.fields.DateField', [], {}),
+            'file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'invoice.invoice': {
             'Meta': {'ordering': "('-invoice_date', 'id')", 'object_name': 'Invoice'},
@@ -92,31 +123,37 @@ class Migration(SchemaMigration):
             'invoice_cost_code': ('django.db.models.fields.CharField', [], {'max_length': '10', 'null': 'True', 'blank': 'True'}),
             'invoice_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.date.today'}),
             'invoice_id': ('django.db.models.fields.CharField', [], {'max_length': '10', 'unique': 'True', 'null': 'True', 'blank': 'True'}),
+            'invoice_related': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'credit_note'", 'unique': 'True', 'null': 'True', 'to': u"orm['invoice.Invoice']"}),
             'invoiced': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_credit_note': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'is_exported': ('django.db.models.fields.CharField', [], {'default': "'no'", 'max_length': '20'}),
+            'is_paid': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
-            'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['adherents.Organization']"})
+            'number': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'blank': 'True'}),
+            'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['company_orm_label']"})
         },
         u'invoice.invoiceitem': {
             'Meta': {'object_name': 'InvoiceItem'},
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'invoice': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'items'", 'to': u"orm['invoice.Invoice']"}),
+            'invoice': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'items'", 'to': u"orm['%s']" % company_orm_label}),
             'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'quantity': ('django.db.models.fields.DecimalField', [], {'default': '1', 'max_digits': '8', 'decimal_places': '2'}),
             'unit_price': ('django.db.models.fields.DecimalField', [], {'max_digits': '8', 'decimal_places': '2'})
         },
         u'invoice.invoicepayment': {
             'Meta': {'object_name': 'InvoicePayment'},
-            'additional_info': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
+            'additional_info': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'amount': ('django.db.models.fields.DecimalField', [], {'max_digits': '8', 'decimal_places': '2'}),
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invoice': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'payments'", 'to': u"orm['invoice.Invoice']"}),
+            'is_exported': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'method': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'paid_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'})
+            'paid_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime(2014, 2, 27, 0, 0)'})
         }
     }
 
