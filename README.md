@@ -21,8 +21,6 @@ The initial version (up to 0.3.1) has been written by [Thomas LOIRET](https://bi
 Install using `pip`...
 
     pip install django-simple-invoice
-    pip install django_extensions
-    pip install reportlab
 
 # Setup
 
@@ -39,10 +37,16 @@ Run the following command
 
 You can add some settings to your `settings.py` to customize the invoice.
 
-	INV_MODULE = 'invoice_mod'
-	INV_CURRENCY = u'EUR'
-	INV_CURRENCY_SYMBOL = u'€'
-	INV_LOGO = join(PROJECT_ROOT,'tocollect/img/logo.jpg')
+	# Django-invoice
+    SITE_NAME = "MyCompany"
+    AUTH_PROFILE_MODULE = 'MyApp.Company'
+    INV_MODULE = 'invoice_mod.pdf'
+    INV_CURRENCY = ''
+    INV_CLIENT_MODULE = 'MyApp.Company'
+    INV_ID_MODULE = 'invoice_mod.numbering'
+    INV_EMAIL_SUBJECT = "MyCompany - Invoice number %%(invoice_id)s"
+    INV_NAME_MODULE = 'invoice_mod.naming'
+    INV_EXPORT_MODULE = 'invoice_mod.export'
 
 # Configure the billing address
 

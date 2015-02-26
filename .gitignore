@@ -6,3 +6,4 @@
 .DS_Store
 docs/_build/
 .coverage
+sftp-config.json
