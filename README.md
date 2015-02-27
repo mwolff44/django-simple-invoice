@@ -31,22 +31,39 @@ Add it to your `INSTALLED_APPS` setting.
         'invoice',
     )
 
-Run the following command
-
-	python manage.py syncdb --migrate
-
 You can add some settings to your `settings.py` to customize the invoice.
 
-	# Django-invoice
-    SITE_NAME = "MyCompany"
-    AUTH_PROFILE_MODULE = 'MyApp.Company'
+    ##################
+    # INVOICE SETTINGS
+    ##################
+    SITE_NAME = 'MyWebsite'
+    AUTH_PROFILE_MODULE = 'myapp.Company'
     INV_MODULE = 'invoice_mod.pdf'
     INV_CURRENCY = ''
-    INV_CLIENT_MODULE = 'MyApp.Company'
+    INV_CLIENT_MODULE = 'myapp.Company'
+
+    from myapp.models import Company
+    INV_MODEL_LABEL = {
+        'Meta': {
+            'object_name': Company.__name__,
+            'db_table': "'%s'" % Company._meta.db_table
+        },
+        Company._meta.pk.attname: (
+            'django.db.models.fields.AutoField', [],
+            {'primary_key': 'True',
+            'db_column': "'%s'" % Company._meta.pk.column}
+        ),
+    }
     INV_ID_MODULE = 'invoice_mod.numbering'
-    INV_EMAIL_SUBJECT = "MyCompany - Invoice number %%(invoice_id)s"
+    INV_EMAIL_SUBJECT = "MyCompany - Invoice Number %%(invoice_id)s"
     INV_NAME_MODULE = 'invoice_mod.naming'
     INV_EXPORT_MODULE = 'invoice_mod.export'
+
+
+Run the following command
+
+    python manage.py syncdb --migrate
+
 
 # Configure the billing address
 

@@ -4,10 +4,10 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
-from .conf import settings as app_settings
-company_orm_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.object_name)
-company_model_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.module_name)
-
+from django.conf import settings as app_settings
+#company_orm_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.object_name)
+#company_model_label = '%s.%s' % (app_settings.INV_CLIENT_MODULE._meta.app_label, app_settings.INV_CLIENT_MODULE._meta.module_name)
+app_model_label = '%s' % app_settings.INV_CLIENT_MODULE
 
 class Migration(SchemaMigration):
 
@@ -26,7 +26,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, blank=True)),
-            ('recipient', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[company_orm_label])),
+            ('recipient', self.gf('django.db.models.fields.related.ForeignKey')(to=orm[app_settings.INV_CLIENT_MODULE])),
             ('number', self.gf('django.db.models.fields.IntegerField')(default=0, db_index=True, blank=True)),
             ('currency', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['invoice.Currency'], null=True, blank=True)),
             ('invoice_id', self.gf('django.db.models.fields.CharField')(max_length=10, unique=True, null=True, blank=True)),
@@ -98,6 +98,7 @@ class Migration(SchemaMigration):
 
 
     models = {
+        app_model_label: app_settings.INV_MODEL_LABEL,
         u'invoice.currency': {
             'Meta': {'object_name': 'Currency'},
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '3'}),
@@ -131,14 +132,14 @@ class Migration(SchemaMigration):
             'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now', 'blank': 'True'}),
             'number': ('django.db.models.fields.IntegerField', [], {'db_index': 'True', 'blank': 'True'}),
-            'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['company_orm_label']"})
+            'recipient': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s']" % app_settings.INV_CLIENT_MODULE})
         },
         u'invoice.invoiceitem': {
             'Meta': {'object_name': 'InvoiceItem'},
             'creation_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'invoice': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'items'", 'to': u"orm['%s']" % company_orm_label}),
+            'invoice': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'items'", 'to': u"orm['invoice.Invoice']"}),
             'modification_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'quantity': ('django.db.models.fields.DecimalField', [], {'default': '1', 'max_digits': '8', 'decimal_places': '2'}),
             'unit_price': ('django.db.models.fields.DecimalField', [], {'max_digits': '8', 'decimal_places': '2'})
